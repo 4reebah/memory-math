@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import GamePage from './pages/GamePage';
 import SignUpPage from './pages/SignUpPage';
 import AdminPage from './pages/AdminPage';
+import './index.css';
 
 
 function App() {
