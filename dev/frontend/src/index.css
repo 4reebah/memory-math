@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Love+Ya+Like+A+Sister&display=swap");
+
+@layer base {
+  html {
+    font-family: "Love Ya Like A Sister", cursive;
+  }
+}

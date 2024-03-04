@@ -8,7 +8,10 @@ module.exports = withMT({
   theme: {
     extend: {
       colors: {
-        customYellow: '#F2D13A',
+        fontFamily: {
+          loveYaLikeASister: ['"LoveYaLikeASister"', "sans-serif"]
+        }
+
       },
     },
   },
