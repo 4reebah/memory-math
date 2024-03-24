@@ -8,7 +8,7 @@
 
 ## Back-end: 
 1. Navigate to dev/backend.
-2. Install Dependiences: pip3 install -r requirements.txt
+2. Install Dependencies: pip3 install -r requirements.txt
 3. Once in the folder, run python3 server.py.
 4. Go to http://localhost:5000 to interact with the back-end.
 
