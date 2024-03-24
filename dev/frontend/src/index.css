@@ -2,10 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Love+Ya+Like+A+Sister&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Love+Ya+Like+A+Sister&display=swap"); 
+@import url("https://fonts.googleapis.com/css2?family=Delius+Unicase:wght@400;700&display=swap");
 
 @layer base {
   html {
-    font-family: "Love Ya Like A Sister", cursive;
+    font-family: "Delius Unicase", cursive;
   }
 }
+
+.container{
+  height: 700px;
+  width: 700px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 1em;
+}
+
+.card {
+  animation: 2s hideTile linear;
+  transform: rotateY(180deg);
+  transition: transform 0.5s;
+}
+
+@keyframes hideTile {
+  0%, 70% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(180deg);
+  }
+}
+
+
+
+/* font-family: "Love Ya Like A Sister", cursive; */
