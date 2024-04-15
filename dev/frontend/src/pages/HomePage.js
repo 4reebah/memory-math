@@ -12,22 +12,31 @@ const HomePage = () => {
     navigate("/game");
   };
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="w-full bg-[#ABCBE2] rounded-lg shadow-md md:mt-0 max-w-6xl xl:p-0">
-        <div className="flex flex-col items-center justify-center border px-9 py-8 rounded-md">
-          <p className="text-6xl justify-center text-center">
+    <div>
+       <nav
+        className="bg-[#ABCBE2]"
+        style={{ fontFamily: "Delius Unicase, cursive" }}
+      >
+        <a href="/" class="flex items-center space-x-2 rtl:space-x-reverse">
+          <span class="self-center text-xl font-semibold ml-[20px] mt-[25px] text-black">
+            Memory Math-O-Rama
+          </span>
+        </a>
+      </nav>
+    <div className="flex items-center flex-col justify-center h-screen bg-[#ABCBE2]">
+          <p className="text-8xl justify-center mb-20 text-center" style={{ fontFamily: "Delius Unicase, cursive" }}>
             <b>Memory Math-O-Rama!</b>
           </p>
           <div className="flex flex-col gap-4">
-            <Button className="font-Delius Unicase text-black text-3xl bg-[#F2D13A]" onClick={handlePlay}>
+            <Button className=" text-black text-3xl bg-[#F2D13A]" onClick={handlePlay} style={{ fontFamily: "Delius Unicase, cursive" }}>
               Play
             </Button>
-            <Button className="font-Delius Unicase text-black text-3xl bg-[#F2D13A]" onClick={handlePlayAsGuest}>
+            <Button className=" text-black text-3xl bg-[#F2D13A]" onClick={handlePlayAsGuest} style={{ fontFamily: "Delius Unicase, cursive" }}>
               Play as Guest
             </Button>
           </div>
-        </div>
-      </div>
+    
+    </div>
     </div>
   );
 };

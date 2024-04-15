@@ -9,7 +9,8 @@ module.exports = withMT({
     extend: {
       colors: {
         fontFamily: {
-          loveYaLikeASister: ['"LoveYaLikeASister"', "sans-serif"]
+          "delius": ["Delius", "cursive"],
+          "delius-unicase": ["Delius Unicase", "cursive"],
         }
 
       },

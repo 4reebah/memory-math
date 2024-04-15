@@ -2,12 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Love+Ya+Like+A+Sister&display=swap"); 
+
+@import url('https://fonts.googleapis.com/css2?family=Delius&display=swap');
 @import url("https://fonts.googleapis.com/css2?family=Delius+Unicase:wght@400;700&display=swap");
 
 @layer base {
   html {
     font-family: "Delius Unicase", cursive;
+     font-family: "Delius", cursive;
   }
 }
 
@@ -20,21 +22,19 @@
   gap: 1em;
 }
 
-.card {
-  animation: 2s hideTile linear;
-  transform: rotateY(180deg);
-  transition: transform 0.5s;
+/* 
+.card number {
+  transform: scale(0);
+  animation: 2s hideNumber linear;
 }
 
 @keyframes hideTile {
   0%, 70% {
-    transform: rotateY(0deg);
+    opacity: 1;
   }
   100% {
-    transform: rotateY(180deg);
+    opacity: 0;
   }
-}
-
-
+} */
 
 /* font-family: "Love Ya Like A Sister", cursive; */
