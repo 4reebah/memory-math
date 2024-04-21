@@ -83,7 +83,7 @@ def add_user():
     return jsonify({'error': str(e)})
 
 @app.route('/check/username', methods=['POST'])
-def checkUsername():
+def check_username():
   try:
     connection = mysql.connector.connect(**config)
     cur = connection.cursor()
@@ -103,7 +103,7 @@ def checkUsername():
     return jsonify({'error': str(e)})
   
 @app.route('/check/email', methods=['POST'])
-def checkEmail():
+def check_email():
   try:
     connection = mysql.connector.connect(**config)
     cur = connection.cursor()
@@ -120,6 +120,64 @@ def checkEmail():
       return jsonify({'success': False, 'message': 'Email Not Found: ' + email})
   except Exception as e:
     return jsonify({'error': str(e)})
+
+@app.route('/users/nonadmin', methods=['GET'])
+def get_non_admin_users():
+    try:
+      connection = mysql.connector.connect(**config)
+      cursor = connection.cursor(dictionary=True)
+      cursor.execute("SELECT * FROM Users WHERE USER_ADMIN = 0")
+      users = cursor.fetchall()
+      users_data = []
+      for user in users:
+          user['SHORTEST_TIME'] = user['SHORTEST_TIME'].total_seconds()
+          users_data.append(user)
+      connection.close()
+      return jsonify(users)
+    except Exception as e:
+      return jsonify({'error': str(e)})
+
+@app.route('/users/admin', methods=['GET'])
+def get_admin_users():
+    try:
+      connection = mysql.connector.connect(**config)
+      cursor = connection.cursor(dictionary=True)
+      cursor.execute("SELECT * FROM Users WHERE USER_ADMIN = 1")
+      users = cursor.fetchall()
+      users_data = []
+      for user in users:
+          user['SHORTEST_TIME'] = user['SHORTEST_TIME'].total_seconds()
+          users_data.append(user)
+      connection.close()
+      return jsonify(users)
+    except Exception as e:
+      return jsonify({'error': str(e)})
+
+@app.route('/deleteUser', methods=['POST'])
+def delete_user():
+  try:
+    connection = mysql.connector.connect(**config)
+    cur = connection.cursor(dictionary=True)
+    body = request.get_json()
+
+    user_id = body.get('user_id')
+
+    cur.execute("SELECT * FROM Users WHERE user_id = %s", (user_id,))
+    user = cur.fetchone()
+
+    if user:
+      cur.execute("DELETE FROM Users WHERE user_id = %s", (user_id,))
+      connection.commit()
+      cur.close()
+      connection.close()
+
+      return jsonify({'success': True, 'message': f'User with ID {user_id} deleted successfully.'})
+    else:
+      cur.close()
+      connection.close()
+      return jsonify({'success': False, 'message': f'User with ID {user_id} does not exist.'})
+  except Exception as e:
+    return jsonify({'success': False, 'error': str(e)})
 
 if __name__ == '__main__':
     app.run(debug=True)
