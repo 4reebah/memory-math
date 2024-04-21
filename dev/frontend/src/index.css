@@ -14,8 +14,8 @@
 }
 
 .container{
-  height: 700px;
-  width: 700px;
+  height: 650px;
+  width: 650px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(4, 1fr);
