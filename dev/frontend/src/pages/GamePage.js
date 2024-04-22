@@ -1,11 +1,38 @@
 import { useState, useEffect } from "react";
 import Tiles from "../components/Tiles.js";
 import { Button } from "@material-tailwind/react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const GamePage = () => {
   const navigate = useNavigate();
+  const isAuthenticated = !!Cookies.get("auth");
+  const [username, setUsername] = useState("");
+  const [id, setId] = useState(0);
+  const [adminStatus, setAdminStatus] = useState(0);
+
+  useEffect(() => {
+    if (Cookies.get("auth")) {
+      const authCookie = Cookies.get("auth");
+
+      const usernameFromCookie = JSON.parse(authCookie).username;
+      setUsername(usernameFromCookie);
+
+      const idFromCookie = JSON.parse(authCookie).user_id;
+      setId(idFromCookie);
+
+      const adminFromCookie = JSON.parse(authCookie).adminStatus;
+      setAdminStatus(adminFromCookie);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    Cookies.remove("auth");
+    navigate("/");
+  };
+
   return (
+
     <div>
       <nav
         className="bg-[#ABCBE2] flex justify-between items-center"
@@ -20,24 +47,28 @@ const GamePage = () => {
           <Button
             className=" text-black bg-[#F2D13A] text-md"
             style={{ fontFamily: "Delius Unicase, cursive" }}
-            onClick={() => navigate('/game')}
+            onClick={() => navigate("/game")}
           >
             Play Game
           </Button>
-          <Button
-            className=" text-black bg-[#F2D13A] text-md"
-            style={{ fontFamily: "Delius Unicase, cursive" }}
-            onClick={() => navigate('/admin')}
-          >
-            Admin Dashboard
-          </Button>
-          <Button
-            className=" text-black bg-[#F2D13A] text-md"
-            style={{ fontFamily: "Delius Unicase, cursive" }}
-            onClick={() => navigate('/')}
-          >
-            Log Out
-          </Button>
+          {(isAuthenticated && adminStatus === 1) && (
+            <Button
+              className=" text-black bg-[#F2D13A] text-md"
+              style={{ fontFamily: "Delius Unicase, cursive" }}
+              onClick={() => navigate("/admin")}
+            >
+              Admin Dashboard
+            </Button>
+          )}
+          {isAuthenticated && (
+            <Button
+              className=" text-black bg-[#F2D13A] text-md"
+              style={{ fontFamily: "Delius Unicase, cursive" }}
+              onClick={handleLogout}
+            >
+              Log Out
+            </Button>
+          )}
         </div>
       </nav>
       <div className="bg-yellow-50 h-screen flex justify-center items-center">

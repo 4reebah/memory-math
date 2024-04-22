@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Input, Button } from "@material-tailwind/react";
+import { Button } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -24,7 +25,16 @@ const LoginPage = () => {
       .then((response) => response.json())
       .then((login) => {
         if (login.success) {
+          const userInfo = {
+            user_id: login.id,
+            username: login.username,
+            adminStatus: login.admin,
+          }
           console.log("Login Successful!");
+          console.log(userInfo);
+          const expirationTime = new Date(new Date().getTime() + 3600000);
+          Cookies.set('auth', JSON.stringify(userInfo), {expires: expirationTime});
+          
           setLoginSuccess(true);
           navigate("/game");
         } else {

@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { Button } from "@material-tailwind/react";
 import { setAnimation } from "@material-tailwind/react/components/Tabs/TabsContext";
+import Cookies from "js-cookie";
 import { useNavigate } from 'react-router-dom';
 
 const AdminPage = () => {
   const navigate = useNavigate();
   const [adminUsers, setAdminUsers] = useState([]);
   const [nonAdminUsers, setNonAdminUsers] = useState([]);
+  const isAuthenticated = !!Cookies.get("auth");
+
   useEffect(() => {
     fetch("http://127.0.0.1:5000/users/admin")
       .then((response) => response.json())
@@ -50,6 +53,13 @@ const AdminPage = () => {
       .catch((error) => console.log(error));
     console.log(`Deleting user with ID: ${userId}`);
   };
+
+  if (!isAuthenticated) {
+    setTimeout(() => {
+      navigate("/login");
+    }, 0);
+    return null;
+  }
 
   return (
     <div className="bg-yellow-50">

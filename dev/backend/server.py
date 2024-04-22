@@ -48,11 +48,11 @@ def login():
         
         cur.execute("SELECT * FROM Users WHERE username = %s", (username,))
         user = cur.fetchone()
-  
+       
         cur.close()
         connection.close()
         if user and bcrypt.checkpw(password.encode('utf-8'), user[6].encode('utf-8')):
-            return jsonify({'success': True, 'message': 'Login successful'})
+            return jsonify({'success': True, 'message': 'Login successful', 'id': user[0], 'admin': user[1], 'username': user[5]})
         else:
             return jsonify({'success': False, 'message': 'Invalid username or password.'})
     except Exception as e:

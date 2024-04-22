@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Input, Button } from "@material-tailwind/react";
-import { Alert } from "@material-tailwind/react";
+import { Button } from "@material-tailwind/react";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
