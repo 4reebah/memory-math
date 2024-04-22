@@ -162,21 +162,21 @@ const Tiles = () => {
       </div>
       <div className="flex flex-row text-center justify-center items-center space-x-3">
         <Button
-          className=" text-black text-xl mt-3 bg-[#F2D13A]"
+          className=" text-black text-lg mt-3 bg-[#F2D13A]"
           style={{ fontFamily: "Delius Unicase, cursive" }}
           onClick={onClickReset}
         >
           Reset Game
         </Button>
         <Button
-          className=" text-black text-xl mt-3 bg-[#F2D13A]"
+          className=" text-black text-lg mt-3 bg-[#F2D13A]"
           style={{ fontFamily: "Delius Unicase, cursive" }}
           //onClick={showAllTiles}
         >
           Hint
         </Button>
         <Button
-          className=" text-black text-xl mt-3 bg-[#F2D13A]"
+          className=" text-black text-lg mt-3 bg-[#F2D13A]"
           style={{ fontFamily: "Delius Unicase, cursive" }}
         >
           Solve
