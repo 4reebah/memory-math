@@ -4,31 +4,21 @@ import { Button } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
-const GamePage = () => {
+const EndGamePage = () => {
   const navigate = useNavigate();
   const isAuthenticated = !!Cookies.get("auth");
   const [username, setUsername] = useState("");
   const [adminStatus, setAdminStatus] = useState(0);
-  const [userInfo, setUserInfo] = useState([]);
 
   useEffect(() => {
     if (Cookies.get("auth")) {
       const authCookie = Cookies.get("auth");
-      const id = JSON.parse(authCookie).user_id;
 
       const usernameFromCookie = JSON.parse(authCookie).username;
       setUsername(usernameFromCookie);
 
       const adminFromCookie = JSON.parse(authCookie).adminStatus;
       setAdminStatus(adminFromCookie);
-
-      fetch(`http://127.0.0.1:5000/user_data?userId=${id}`)
-        .then((response) => response.json())
-        .then((userData) => {
-          setUserInfo(userData);
-          console.log(userData);
-        })
-        .catch((error) => console.error("Error fetching user data:", error));
     }
   }, []);
 
@@ -78,24 +68,24 @@ const GamePage = () => {
       </nav>
       <div className="bg-yellow-50 h-screen flex justify-center items-center">
         <div className="bg-[#ABCBE2] w-fit p-5 justify-center items-center align-center mt-5">
-          <Tiles></Tiles>
           <div
+            className="end flex flex-col justify-center items-center"
             style={{ fontFamily: "Delius Unicase, cursive" }}
-            className="flex flex-row justify-between mt-5"
           >
-            <p className="mt-3 text-lg">
-              <div>
-                <b>SHORTEST TIME:</b> {userInfo["SHORTEST_TIME"]} seconds
-              </div>
-            </p>
-            <p className="mt-3 text-lg">
-              <b>LOWEST NUMBER OF MISTAKES:</b> {userInfo["LOWEST_NUMBER_OF_MISTAKES"]}
-            </p>
+            <div className="text-8xl mb-5 text-bold">You Win!</div>
+            <div className="text-black text-lg">Time: </div>
+            <div className="text-black text-lg">Number of Mistakes: </div>
+            <Button
+              className=" text-black text-3xl mt-10 bg-[#F2D13A]"
+              style={{ fontFamily: "Delius Unicase, cursive" }}
+              onClick={() => navigate("/game")}
+            >
+              Play Again
+            </Button>
           </div>
-          
         </div>
       </div>
     </div>
   );
 };
-export default GamePage;
+export default EndGamePage;

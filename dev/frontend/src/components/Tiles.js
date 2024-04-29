@@ -9,36 +9,89 @@ const Tiles = () => {
   const [numberSelected, setnumberSelected] = useState(0);
   const [currentIndexes, setCurrentIndexes] = useState([]);
   const [showInstructions, setShowInstructions] = useState(false);
+
   const [answers, setAnswers] = useState();
+
   const [tiles, setTiles] = useState([
-    { id: 1, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 2, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 3, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 4, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 5, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 6, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 7, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 8, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 9, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 10, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 11, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 12, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 13, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 14, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 15, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
-    { id: 16, number: Math.floor(Math.random() * 20) + 1, stateOfTile: false },
+    { id: 1, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 2, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 3, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 4, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 5, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 6, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 7, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 8, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 9, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 10, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 11, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 12, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 13, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 14, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 15, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
+    { id: 16, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
   ]);
   
+  useEffect(() => {
+    const setAllToFalse = () => {
+      const updatedTiles = tiles.map(tile => ({
+        ...tile,
+        stateOfTile: false
+      }));
+      setTiles(updatedTiles);
+      while (true) {
+        const firstNumber = Math.floor(Math.random() * tiles.length);
+        const secondNumber = Math.floor(Math.random() * tiles.length);
+        if (firstNumber !== secondNumber) {
+        let valOne = tiles[firstNumber].number
+        let valTwo = tiles[secondNumber].number
+          setAnswers(valOne + valTwo)
+          break;
+        }
+      }
+    }
+    const timer = setTimeout(() => {
+      setAllToFalse();
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const onClickReset = (event) => {
-    setshowNumber(true);
+    setRunning(false);
+    showAllTiles();
     setMistakes(0);
+    setRunning(true);
+    setTime(0);
+  };
+
+  const [running, setRunning] = useState(true);
+  const [time, setTime] = useState(0);
+
+  useEffect(() => {
+    let timer;
+    if (running) {
+      timer = setInterval(() => {
+        setTime((prevTime) => prevTime + 1);
+      }, 1000);
+    } else {
+      clearInterval(timer);
+    }
+    return () => clearInterval(timer);
+  }, [running]);
+
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    return `${hours < 10 ? "0" : ""}${hours}:${
+      minutes < 10 ? "0" : ""
+    }${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   };
 
   const handleShowInstructions = () => {
     setShowInstructions(true);
   };
 
-  const handleCloseInstructions= () => {
+  const handleCloseInstructions = () => {
     setShowInstructions(false);
   };
 
@@ -80,14 +133,9 @@ const Tiles = () => {
 
     return () => clearTimeout(timeout);
   }, []);
-  
-  useEffect(() => {
-    setAnswers(createAnswers(tiles));
-  }, [tiles]);
 
   console.log(currentIndexes);
   console.log(numberSelected);
-  console.log(answers);
 
   if (numberSelected === 2) {
     if (
@@ -108,10 +156,41 @@ const Tiles = () => {
       });
       setnumberSelected(0);
       setAnswers(createAnswers(tiles));
-    }
+      checkTrue(tiles);
+
+      if (checkTrue(tiles)) {
+        console.log("DONEEE");
+      }
+    } 
   }
- 
-  console.log(tiles);
+
+  const showAllTiles = (e) => {
+    e.preventDefault();
+    const currentShowNumber = showNumber;
+    console.log(currentShowNumber)
+    let temp = {
+      0: true,
+      1: true,
+      2: true,
+      3: true,
+      4: true,
+      5: true,
+      6: true,
+      7: true,
+      8: true,
+      9: true,
+      10: true,
+      11: true,
+      12: true,
+      13: true,
+      14: true,
+      15: true
+    }
+    setshowNumber(temp);
+    const timer = setTimeout(() => {
+      setshowNumber(currentShowNumber)
+    }, 10000);
+  }
 
   return (
     <div>
@@ -124,12 +203,18 @@ const Tiles = () => {
           Find the two tiles that sum up to {answers}!{" "}
         </h2>
       )}
+      {!answers && (
+        <h2 className="mb-5 text-4xl text-center">
+          {" "}
+          Remember the numbers on the tiles!{" "}
+        </h2>
+      )}
       <div className="container">
         {tiles.map((tile, index) => (
           <div
             key={index}
             className={`${
-              tile.stateOfTile ? "bg-[#4caf50]" : "bg-gray-200"
+              tiles[index].stateOfTile ? "bg-[#4caf50]" : "bg-gray-200"
             } flex justify-center items-center rounded-md text-7xl`}
             onClick={() => onClickTileHandler(index)}
           >
@@ -154,7 +239,7 @@ const Tiles = () => {
         className="flex flex-row justify-between"
       >
         <p className="mt-3 text-lg">
-          <Timer></Timer>
+          <div><b>TIMER:</b> {formatTime(time)}</div>
         </p>
         <p className="mt-3 text-lg">
           <b>Number of Mistakes:</b> {mistakes}
@@ -171,7 +256,7 @@ const Tiles = () => {
         <Button
           className=" text-black text-lg mt-3 bg-[#F2D13A]"
           style={{ fontFamily: "Delius Unicase, cursive" }}
-          //onClick={showAllTiles}
+         onClick={showAllTiles}
         >
           Hint
         </Button>
@@ -181,7 +266,10 @@ const Tiles = () => {
         >
           Solve
         </Button>
-        <button className="mt-10 flex justify-end" onClick={handleShowInstructions}>
+        <button
+          className="mt-10 flex justify-end"
+          onClick={handleShowInstructions}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -202,7 +290,6 @@ const Tiles = () => {
 export default Tiles;
 
 function createAnswers(tiles) {
-  console.log(tiles);
   let numbers = [];
   let answer = 0;
   for (let i = 0; i < tiles.length; i++) {
@@ -225,3 +312,19 @@ function createAnswers(tiles) {
   console.log(answer);
   return answer;
 }
+
+function checkTrue(tiles) {
+  let numbers = [];
+  let count = 14;
+  for (let i = 0; i < tiles.length; i++) {
+    if (!tiles[i].stateOfTile) {
+      count--;
+      return false;
+    }
+  }
+  if (count === 0)
+    return true;
+}
+      
+    
+

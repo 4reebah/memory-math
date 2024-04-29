@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 const AdminPage = () => {
   const navigate = useNavigate();
+  const [adminStatus, setAdminStatus] = useState(0);
   const [adminUsers, setAdminUsers] = useState([]);
   const [nonAdminUsers, setNonAdminUsers] = useState([]);
   const isAuthenticated = !!Cookies.get("auth");
@@ -28,6 +29,15 @@ const AdminPage = () => {
         console.log(users);
       })
       .catch((error) => console.error("Error fetching user data:", error));
+  }, []);
+
+  useEffect(() => {
+    if (Cookies.get("auth")) {
+      const authCookie = Cookies.get("auth");
+
+      const adminFromCookie = JSON.parse(authCookie).adminStatus;
+      setAdminStatus(adminFromCookie);
+    }
   }, []);
 
   const deleteUser = (userId) => {
@@ -99,7 +109,7 @@ const AdminPage = () => {
 
       <div className="bg-yellow-50 h-screen">
         <div
-          className="flex justify-center text-xl"
+          className="flex justify-center text-xl mt-10"
           style={{ fontFamily: "Delius Unicase, cursive" }}
         >
           <b>ADMIMISTRATIVE USERS</b>

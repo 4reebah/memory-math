@@ -179,5 +179,21 @@ def delete_user():
   except Exception as e:
     return jsonify({'success': False, 'error': str(e)})
 
+
+@app.route('/user_data', methods=['GET'])
+def get_user():
+  try:
+    user_id = request.args.get('userId')  
+    connection = mysql.connector.connect(**config)
+    cur = connection.cursor(dictionary=True)
+    cur.execute("SELECT * FROM Users WHERE user_id = %s", (user_id,))
+    user = cur.fetchone()
+    user['SHORTEST_TIME'] = user['SHORTEST_TIME'].total_seconds()
+    connection.close()
+    return jsonify(user)
+  except Exception as e:
+    return jsonify({'error': str(e)})
+   
+
 if __name__ == '__main__':
     app.run(debug=True)

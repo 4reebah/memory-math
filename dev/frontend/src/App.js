@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import GamePage from './pages/GamePage';
 import SignUpPage from './pages/SignUpPage';
 import AdminPage from './pages/AdminPage';
+import EndGamePage from './pages/EndGamePage';
 import './index.css';
 
 
@@ -16,6 +17,7 @@ function App() {
         <Route path='signup' element={<SignUpPage/>} />
         <Route path='game' element={<GamePage/>} />
         <Route path='admin' element={<AdminPage/>} />
+        <Route path='end' element={<EndGamePage/>} />
       </Routes>
     </Router>
   );

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 
-
 const Timer = () => {
   const [running, setRunning] = useState(true);
   const [time, setTime] = useState(0);
