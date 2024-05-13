@@ -64,6 +64,30 @@ const AdminPage = () => {
     console.log(`Deleting user with ID: ${userId}`);
   };
 
+  const changeStatus = (userId) => {
+    const changeAccount = {
+      user_id: userId,
+    };
+    fetch("http://127.0.0.1:5000/update_admin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(changeAccount),
+    })
+      .then((response) => response.json())
+      .then((changeUser) => {
+        console.log(changeUser)
+        if (changeUser.success) {
+          console.log("Status Changed Successfully!");
+          window.location.reload(); 
+        } else {
+          console.log("Status Change Failed: ", changeUser.message);
+        }
+      })
+      .catch((error) => console.log(error));
+  };
+
   if (!isAuthenticated) {
     setTimeout(() => {
       navigate("/login");
@@ -160,6 +184,7 @@ const AdminPage = () => {
                 <th className="px-4 py-2">EMAIL</th>
                 <th className="px-4 py-2">USERNAME</th>
                 <th className="px-4 py-2">DELETE USER</th>
+                <th className="px-4 py-2">UPDATE USER STATUS</th>
               </tr>
             </thead>
             <tbody>
@@ -177,6 +202,15 @@ const AdminPage = () => {
                       style={{ fontFamily: "Delius Unicase, cursive" }}
                     >
                       DELETE
+                    </Button>
+                  </td>
+                  <td className="px-4 py-2">
+                    <Button
+                      className=" text-black  bg-[#F2D13A]"
+                      onClick={() => changeStatus(user.USER_ID)}
+                      style={{ fontFamily: "Delius Unicase, cursive" }}
+                    >
+                      CHANGE TO ADMIN
                     </Button>
                   </td>
                 </tr>

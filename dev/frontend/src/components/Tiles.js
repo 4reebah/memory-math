@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@material-tailwind/react";
 import Timer from "../components/Timer.js";
 import Instructions from "./Instructions.js";
+import { useNavigate } from "react-router-dom";
 
 const Tiles = () => {
   const [showNumber, setshowNumber] = useState(true);
@@ -9,9 +10,12 @@ const Tiles = () => {
   const [numberSelected, setnumberSelected] = useState(0);
   const [currentIndexes, setCurrentIndexes] = useState([]);
   const [showInstructions, setShowInstructions] = useState(false);
-
+  const [isTileDisabled, setTileisDisabled] = useState(false);
   const [answers, setAnswers] = useState();
-
+  const [disableHintButton, setDisableHintButton] = useState();
+  const [createNewAnswer, setCreateNewAnswer] = useState(0);
+  const navigate = useNavigate();
+  const [disableSolve, setDisableSolve] = useState(false);
   const [tiles, setTiles] = useState([
     { id: 1, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
     { id: 2, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
@@ -30,38 +34,46 @@ const Tiles = () => {
     { id: 15, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
     { id: 16, number: Math.floor(Math.random() * 20) + 1, stateOfTile: true },
   ]);
-  
+
+  const handleHintPenalty = () => {
+    if (running) {
+      setTime((prevTime) => prevTime + 5);
+    }
+  };
+
+  const handleSolvePenalty = () => {
+    if (running) {
+      setTime((prevTime) => prevTime + 30);
+    }
+  };
+
   useEffect(() => {
+    setDisableSolve(true);
+    setDisableHintButton(true);
     const setAllToFalse = () => {
-      const updatedTiles = tiles.map(tile => ({
+      const updatedTiles = tiles.map((tile) => ({
         ...tile,
-        stateOfTile: false
+        stateOfTile: false,
       }));
       setTiles(updatedTiles);
       while (true) {
         const firstNumber = Math.floor(Math.random() * tiles.length);
         const secondNumber = Math.floor(Math.random() * tiles.length);
         if (firstNumber !== secondNumber) {
-        let valOne = tiles[firstNumber].number
-        let valTwo = tiles[secondNumber].number
-          setAnswers(valOne + valTwo)
+          let valOne = tiles[firstNumber].number;
+          let valTwo = tiles[secondNumber].number;
+          setAnswers(valOne + valTwo);
           break;
         }
       }
-    }
+    };
     const timer = setTimeout(() => {
+      setDisableSolve(false);
+      setDisableHintButton(false);
       setAllToFalse();
     }, 10000);
     return () => clearTimeout(timer);
   }, []);
-
-  const onClickReset = (event) => {
-    setRunning(false);
-    showAllTiles();
-    setMistakes(0);
-    setRunning(true);
-    setTime(0);
-  };
 
   const [running, setRunning] = useState(true);
   const [time, setTime] = useState(0);
@@ -94,12 +106,13 @@ const Tiles = () => {
   const handleCloseInstructions = () => {
     setShowInstructions(false);
   };
-
+  let timeoutId = null;
   const onClickTileHandler = (index) => {
     if (numberSelected < 0) {
       setnumberSelected(0);
     }
     if (numberSelected < 2) {
+      setDisableHintButton(true);
       setnumberSelected((prevState) => prevState + 1);
       setshowNumber((prevState) => ({
         ...prevState,
@@ -108,7 +121,8 @@ const Tiles = () => {
       setCurrentIndexes((prevState) => {
         return [...prevState, index];
       });
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
+        setDisableHintButton(false);
         setshowNumber((prevState) => ({
           ...prevState,
           [index]: false,
@@ -136,7 +150,10 @@ const Tiles = () => {
 
   console.log(currentIndexes);
   console.log(numberSelected);
-
+  const tilesRef = useRef(tiles);
+  useEffect(() => {
+    tilesRef.current = tiles; 
+  }, [tiles]);
   if (numberSelected === 2) {
     if (
       tiles[currentIndexes[0]].number + tiles[currentIndexes[1]].number ===
@@ -154,20 +171,47 @@ const Tiles = () => {
         }; // Update stateOfTile to true for the specified tile
         return updatedTiles;
       });
+
+      setTimeout(() => {}, 10);
       setnumberSelected(0);
-      setAnswers(createAnswers(tiles));
+      setCreateNewAnswer((prevState) => prevState + 1);
+    }
+  }
+
+  useEffect(() => {
+    if (numberSelected === 2) {
+      if (
+        tiles[currentIndexes[0]].number + tiles[currentIndexes[1]].number !==
+        answers
+      ) {
+        console.log("hle");
+        setMistakes((prevState) => prevState + 1);
+      }
+    }
+  }, [numberSelected]);
+
+  useEffect(() => {
+    console.log("createNewAnswer" + createNewAnswer);
+    console.log("createNew" + tiles);
+    if (tiles && createNewAnswer >= 1) {
+      let value = createAnswers(tiles);
+      console.log("value" + value);
+      setAnswers(value);
       checkTrue(tiles);
 
       if (checkTrue(tiles)) {
-        console.log("DONEEE");
+        navigate("/end", { state: { time: time, numberMistakes: mistakes } });
       }
-    } 
-  }
+    }
+  }, [createNewAnswer, tiles]);
 
   const showAllTiles = (e) => {
     e.preventDefault();
+    setDisableSolve(true);
+    clearTimeout(timeoutId);
     const currentShowNumber = showNumber;
-    console.log(currentShowNumber)
+    console.log(currentShowNumber);
+    setTileisDisabled(true);
     let temp = {
       0: true,
       1: true,
@@ -184,13 +228,83 @@ const Tiles = () => {
       12: true,
       13: true,
       14: true,
-      15: true
-    }
+      15: true,
+    };
     setshowNumber(temp);
     const timer = setTimeout(() => {
-      setshowNumber(currentShowNumber)
+      setTileisDisabled(false);
+      setDisableSolve(false);
+      setshowNumber(currentShowNumber);
     }, 10000);
-  }
+    handleHintPenalty();
+  };
+
+  const handleSolve = () => {
+    let indexone = 0;
+    let indexTwo = 0;
+    const numMap = new Map();
+    let numbers = [];
+    //values that are not green
+    for (let i = 0; i < tiles.length; i++) {
+      if (!tiles[i].stateOfTile) {
+        numbers.push(tiles[i].number);
+      }
+    }
+    // two sum algo to get those values
+    for (let i = 0; i < numbers.length; i++) {
+      const complement = answers - numbers[i];
+      if (numMap.has(complement)) {
+        indexone = complement;
+        indexTwo = numbers[i];
+      }
+      numMap.set(numbers[i], i);
+    }
+
+    //set the indexof of those values to green and flipped
+    let tileindexOne = 0;
+    let tileIndexTwo = 0;
+    for (let i = 0; i < tiles.length; i++) {
+      if (!tiles[i].stateOfTile) {
+        if (tiles[i].number === indexone) {
+          tileindexOne = i;
+        }
+        if (tiles[i].number === indexTwo) {
+          tileIndexTwo = i;
+        }
+      }
+    }
+    setTiles((prevTiles) => {
+      const updatedTiles = [...prevTiles];
+      updatedTiles[tileindexOne] = {
+        ...updatedTiles[tileindexOne],
+        stateOfTile: true,
+      };
+      return updatedTiles;
+    });
+    setTiles((prevTiles) => {
+      const updatedTiles = [...prevTiles];
+      updatedTiles[tileIndexTwo] = {
+        ...updatedTiles[tileIndexTwo],
+        stateOfTile: true,
+      }; // Update stateOfTile to true for the specified tile
+      return updatedTiles;
+    });
+    // Update stateOfTile to true for the specified tile
+    setCreateNewAnswer((prevState) => prevState + 1);
+    handleSolvePenalty();
+  };
+
+  useEffect(() => {
+    let count = 0;
+    for (let i = 0; i < tiles.length; i++) {
+      if (tiles[i].stateOfTile) {
+        count += 1;
+      }
+    }
+    if (count === 14) {
+      setDisableSolve(true);
+    }
+  }, [tiles]);
 
   return (
     <div>
@@ -216,7 +330,7 @@ const Tiles = () => {
             className={`${
               tiles[index].stateOfTile ? "bg-[#4caf50]" : "bg-gray-200"
             } flex justify-center items-center rounded-md text-7xl`}
-            onClick={() => onClickTileHandler(index)}
+            onClick={!isTileDisabled ? () => onClickTileHandler(index) : null}
           >
             <p
               className={
@@ -239,7 +353,9 @@ const Tiles = () => {
         className="flex flex-row justify-between"
       >
         <p className="mt-3 text-lg">
-          <div><b>TIMER:</b> {formatTime(time)}</div>
+          <div>
+            <b>TIMER:</b> {formatTime(time)}
+          </div>
         </p>
         <p className="mt-3 text-lg">
           <b>Number of Mistakes:</b> {mistakes}
@@ -249,40 +365,26 @@ const Tiles = () => {
         <Button
           className=" text-black text-lg mt-3 bg-[#F2D13A]"
           style={{ fontFamily: "Delius Unicase, cursive" }}
-          onClick={onClickReset}
-        >
-          Reset Game
-        </Button>
-        <Button
-          className=" text-black text-lg mt-3 bg-[#F2D13A]"
-          style={{ fontFamily: "Delius Unicase, cursive" }}
-         onClick={showAllTiles}
+          onClick={showAllTiles}
+          disabled={disableHintButton}
         >
           Hint
         </Button>
         <Button
           className=" text-black text-lg mt-3 bg-[#F2D13A]"
           style={{ fontFamily: "Delius Unicase, cursive" }}
+          onClick={handleSolve}
+          disabled={disableSolve}
         >
           Solve
         </Button>
-        <button
-          className="mt-10 flex justify-end"
+        <Button
+          className=" text-black text-lg mt-3 bg-[#F2D13A]"
+          style={{ fontFamily: "Delius Unicase, cursive" }}
           onClick={handleShowInstructions}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-7 h-7"
-          >
-            <path
-              fillRule="evenodd"
-              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm11.378-3.917c-.89-.777-2.366-.777-3.255 0a.75.75 0 0 1-.988-1.129c1.454-1.272 3.776-1.272 5.23 0 1.513 1.324 1.513 3.518 0 4.842a3.75 3.75 0 0 1-.837.552c-.676.328-1.028.774-1.028 1.152v.75a.75.75 0 0 1-1.5 0v-.75c0-1.279 1.06-2.107 1.875-2.502.182-.088.351-.199.503-.331.83-.727.83-1.857 0-2.584ZM12 18a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
+          How To Play?
+        </Button>
       </div>
     </div>
   );
@@ -292,21 +394,25 @@ export default Tiles;
 function createAnswers(tiles) {
   let numbers = [];
   let answer = 0;
+  console.log(tiles);
   for (let i = 0; i < tiles.length; i++) {
     if (!tiles[i].stateOfTile) {
       numbers.push(tiles[i].number);
     }
   }
-  while (true) {
-    const firstNumber = Math.floor(Math.random() * numbers.length);
-    const secondNumber = Math.floor(Math.random() * numbers.length);
-    if (firstNumber !== secondNumber) {
-      console.log("firstNumber" + firstNumber);
-      console.log("second " + secondNumber);
-      let valOne = numbers[firstNumber];
-      let valTwo = numbers[secondNumber];
-      answer = valOne + valTwo;
-      break;
+  if (numbers.length > 0) {
+    console.log("valuenumbers" + numbers);
+    while (true) {
+      const firstNumber = Math.floor(Math.random() * numbers.length);
+      const secondNumber = Math.floor(Math.random() * numbers.length);
+      if (firstNumber !== secondNumber) {
+        console.log("firstNumber" + firstNumber);
+        console.log("second " + secondNumber);
+        let valOne = numbers[firstNumber];
+        let valTwo = numbers[secondNumber];
+        answer = valOne + valTwo;
+        break;
+      }
     }
   }
   console.log(answer);
@@ -314,17 +420,14 @@ function createAnswers(tiles) {
 }
 
 function checkTrue(tiles) {
+  console.log("yo");
+  console.log(tiles);
   let numbers = [];
   let count = 14;
   for (let i = 0; i < tiles.length; i++) {
     if (!tiles[i].stateOfTile) {
-      count--;
       return false;
     }
   }
-  if (count === 0)
-    return true;
+  return true;
 }
-      
-    
-

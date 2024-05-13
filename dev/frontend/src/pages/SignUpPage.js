@@ -12,9 +12,23 @@ const SignUpPage = () => {
 
   const [usernameExists, setUsernameExists] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
+  const [fillOut, setFillOut] = useState(false);
+  const [passwordLength, setPasswordLength] = useState(false);
+
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    
+    if (!firstName || !lastName || !email || !username || !password) {
+      setFillOut(true);
+      return;
+    }
+
+    if (password.length < 8) {
+      setPasswordLength(true);
+      return;
+    }
+
     const newAccount = {
       firstName: firstName,
       lastName: lastName,
@@ -191,6 +205,46 @@ const SignUpPage = () => {
                         <b>REGISTRATION FAILED - USERNAME ALREADY EXISTS!</b>
                       </div>
                     )}
+                  </div>
+                )}
+                {fillOut && (
+                  <div
+                    className="flex items-center p-4 mt-3 text-red-900 rounded-lg bg-red-100"
+                    role="alert"
+                  >
+                    <svg
+                      className="flex-shrink-0 w-4 h-4"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                    </svg>
+                    
+                    <div className="ms-3 text-sm font-medium">
+                      <b>REGISTRATION FAILED - PLEASE FILL OUT ALL FIELDS!</b>
+                    </div>
+                  </div>
+                )}
+                {passwordLength && (
+                  <div
+                    className="flex items-center p-4 mt-3 text-red-900 rounded-lg bg-red-100"
+                    role="alert"
+                  >
+                    <svg
+                      className="flex-shrink-0 w-4 h-4"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                    </svg>
+                    
+                    <div className="ms-3 text-sm font-medium">
+                      <b>REGISTRATION FAILED - PASSWORD MUST BE EIGHT CHARACTERS!</b>
+                    </div>
                   </div>
                 )}
                 <Button

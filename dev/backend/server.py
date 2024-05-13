@@ -3,6 +3,8 @@ from flask_cors import CORS
 import mysql.connector
 from flask_bcrypt import bcrypt
 import yaml
+from datetime import datetime
+
 
 app = Flask(__name__)
 CORS(app)
@@ -73,7 +75,7 @@ def add_user():
 
     password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-    cur.execute("INSERT INTO USERS (FIRST_NAME, LAST_NAME, USER_ADMIN, USERNAME, EMAIL, PASSWORD_HASH, SHORTEST_TIME, LOWEST_NUMBER_OF_MISTAKES) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (first_name, last_name, 0, username, email, password_hash, '00:00:00', 0))
+    cur.execute("INSERT INTO USERS (FIRST_NAME, LAST_NAME, USER_ADMIN, USERNAME, EMAIL, PASSWORD_HASH, SHORTEST_TIME, LOWEST_NUMBER_OF_MISTAKES) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (first_name, last_name, 0, username, email, password_hash, '00:00:00', -1))
     connection.commit()
     cur.close()
     connection.close()
@@ -179,7 +181,6 @@ def delete_user():
   except Exception as e:
     return jsonify({'success': False, 'error': str(e)})
 
-
 @app.route('/user_data', methods=['GET'])
 def get_user():
   try:
@@ -193,6 +194,74 @@ def get_user():
     return jsonify(user)
   except Exception as e:
     return jsonify({'error': str(e)})
+  
+@app.route('/update_user_data', methods=['POST'])
+def update_user_data():
+  try:
+    connection = mysql.connector.connect(**config)
+    cur = connection.cursor()
+    data = request.get_json()
+
+    user_id = data.get('userId')
+    time = data.get('time')
+    mistakes = data.get('mistakes')
+
+    print(time)
+
+    cur.execute("SELECT SHORTEST_TIME, LOWEST_NUMBER_OF_MISTAKES FROM Users WHERE user_id = %s", (user_id,))
+    result = cur.fetchone()
+
+    print(result)
+
+    if result:
+      db_time, db_mistakes = result
+
+      if time is not None:
+        new_time_hours = time // 3600
+        new_time_minutes = (time % 3600) // 60
+        new_time_seconds = time % 60
+        new_time_str = "{:02d}:{:02d}:{:02d}".format(new_time_hours, new_time_minutes, new_time_seconds)
+
+      if time and (db_time.total_seconds() == 0 or time < db_time.total_seconds()):  
+        cur.execute("UPDATE Users SET SHORTEST_TIME = %s WHERE user_id = %s", (new_time_str, user_id))
+
+      if mistakes is not None and (db_mistakes == -1 or mistakes < db_mistakes):
+        cur.execute("UPDATE Users SET LOWEST_NUMBER_OF_MISTAKES = %s WHERE user_id = %s", (mistakes, user_id))
+    else:
+      return jsonify({'error': 'User not found'})
+
+    connection.commit()
+    cur.close()
+    connection.close()
+    return jsonify({'success': True})
+
+  except Exception as e:
+    return jsonify({'error': str(e)})
+  
+@app.route('/update_admin', methods=['POST'])
+def update_admin():
+  try:
+    connection = mysql.connector.connect(**config)
+    cur = connection.cursor(dictionary=True)
+    body = request.get_json()
+
+    user_id = body.get('user_id')
+
+    cur.execute("SELECT * FROM Users WHERE user_id = %s", (user_id,))
+    result = cur.fetchone()
+
+    if result:
+      cur.execute("UPDATE Users SET USER_ADMIN = %s WHERE user_id = %s", (1, user_id))
+      connection.commit()
+    else:
+      return jsonify({'error': 'User not found'})
+    cur.close()
+    connection.close()
+    return jsonify({'success': True, 'message': f'User with ID {user_id} changed to admin status successfully.'})
+
+  except Exception as e:
+    return jsonify({'error': str(e)})
+
    
 
 if __name__ == '__main__':

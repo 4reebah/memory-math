@@ -77,22 +77,24 @@ const GamePage = () => {
         </div>
       </nav>
       <div className="bg-yellow-50 h-screen flex justify-center items-center">
-        <div className="bg-[#ABCBE2] w-fit p-5 justify-center items-center align-center mt-5">
+        <div className="bg-[#ABCBE2] w-fit p-5 justify-center items-center align-center mt-5 rounded-md">
           <Tiles></Tiles>
+          {(username &&
           <div
             style={{ fontFamily: "Delius Unicase, cursive" }}
             className="flex flex-row justify-between mt-5"
           >
+
             <p className="mt-3 text-lg">
               <div>
-                <b>SHORTEST TIME:</b> {userInfo["SHORTEST_TIME"]} seconds
+                <b>SHORTEST TIME:</b> {userInfo["SHORTEST_TIME"] !== 0 ? `${userInfo["SHORTEST_TIME"]}` : "___"} seconds
               </div>
             </p>
             <p className="mt-3 text-lg">
-              <b>LOWEST NUMBER OF MISTAKES:</b> {userInfo["LOWEST_NUMBER_OF_MISTAKES"]}
+              <b>LOWEST NUMBER OF MISTAKES:</b> {userInfo["LOWEST_NUMBER_OF_MISTAKES"] !== -1 ? userInfo["LOWEST_NUMBER_OF_MISTAKES"] : "___"}
             </p>
           </div>
-          
+        )}
         </div>
       </div>
     </div>

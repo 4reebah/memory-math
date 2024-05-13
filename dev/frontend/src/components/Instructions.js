@@ -36,22 +36,23 @@ const Instructions = ({ close }) => {
 
           <div class="p-4 text-lg space-y-4">
             <p class=" text-gray-900">
-              To play, flip over the tiles that correctly answer the question at
-              the top. If you flip over the two correct tiles, those tiles will
-              turn green. If you flip over the incorrect ones, those tiles will
-              turn red and flip back. On top of that, the game will track your
-              time and your mistakes.
+              To play the game, flip over the tiles that correctly answer the
+              question at the top. If you flip over the two correct tiles, those
+              tiles will turn green. If you flip over the incorrect ones, those
+              tiles will flip back. Play until all the tiles turn green!
+            </p>
+            <p class=" text-gray-900">
+              The game will track your time and the number of mistakes you make.
+              If you log in, your best stastics will be saved.
             </p>
             <p class=" text-gray-900">
               If you get stuck, you can use the HINT button to view the tiles
-              for ten seconds for a time penalty of fifteen seconds. You can
-              also use the SOLVE button to flip over the tiles that correctly
-              answer the question for a time penalty of thirty seconds.
+              for ten seconds for a time penalty of five seconds. You can also
+              use the SOLVE button to flip over the tiles that correctly answer
+              the question for a time penalty of thirty seconds. You can't use
+              SOLVE and HINT at the same time.
             </p>
-
-            <p class=" text-gray-900">
-              If you want to restart the game, click the RESET GAME button.
-            </p>
+            <p class=" text-gray-900">Enjoy the game!</p>
           </div>
         </div>
       </div>
