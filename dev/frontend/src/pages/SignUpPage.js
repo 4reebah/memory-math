@@ -37,7 +37,7 @@ const SignUpPage = () => {
       password: password,
     };
 
-    fetch("http://127.0.0.1:5000/check/username", {
+    fetch("http://aiqbal.pythonanywhere.com/check/username", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newAccount),
@@ -55,7 +55,7 @@ const SignUpPage = () => {
       })
       .catch((error) => console.log(error));
 
-    fetch("http://127.0.0.1:5000/check/email", {
+    fetch("http://aiqbal.pythonanywhere.com/check/email", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newAccount),
@@ -74,7 +74,7 @@ const SignUpPage = () => {
       .catch((error) => console.log(error));
 
     if (!emailExists && !usernameExists) {
-      fetch("http://127.0.0.1:5000/add_user", {
+      fetch("http://aiqbal.pythonanywhere.com/add_user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newAccount),

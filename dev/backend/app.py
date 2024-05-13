@@ -10,10 +10,11 @@ app = Flask(__name__)
 CORS(app)
 
 config = {
-  'user': 'root',
-  'password': "",
-  'host': 'localhost',
-  'database': 'memory-math',
+  'user': 'aiqbal',
+  'password': 'cs161proj',
+  'host': 'aiqbal.mysql.pythonanywhere-services.com',
+  'port': '3306',
+  'database': 'aiqbal$memory_math',
 }
 
 @app.route('/')
