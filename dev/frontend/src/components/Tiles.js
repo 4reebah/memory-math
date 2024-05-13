@@ -208,6 +208,7 @@ const Tiles = () => {
   const showAllTiles = (e) => {
     e.preventDefault();
     setDisableSolve(true);
+    setDisableHintButton(true);
     clearTimeout(timeoutId);
     const currentShowNumber = showNumber;
     console.log(currentShowNumber);
@@ -234,6 +235,7 @@ const Tiles = () => {
     const timer = setTimeout(() => {
       setTileisDisabled(false);
       setDisableSolve(false);
+      setDisableHintButton(false);
       setshowNumber(currentShowNumber);
     }, 10000);
     handleHintPenalty();
