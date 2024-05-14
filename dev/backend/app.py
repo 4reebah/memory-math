@@ -6,9 +6,8 @@ from flask_bcrypt import bcrypt
 import yaml
 from datetime import datetime
 
-
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=['http://aiqbal.pythonanywhere.com/', 'https://memory-math.vercel.app', 'http://localhost:3000'])
 
 config = {
   'user': 'aiqbal',
@@ -57,7 +56,7 @@ def get_users():
     try:
       connection = mysql.connector.connect(**config)
       cursor = connection.cursor(dictionary=True)
-      cursor.execute("SELECT * FROM Users")
+      cursor.execute("SELECT * FROM USERS")
       users = cursor.fetchall()
       users_data = []
       for user in users:
@@ -70,17 +69,17 @@ def get_users():
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    try: 
+    try:
         connection = mysql.connector.connect(**config)
         cur = connection.cursor()
 
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
-        
-        cur.execute("SELECT * FROM Users WHERE username = %s", (username,))
+
+        cur.execute("SELECT * FROM USERS WHERE username = %s", (username,))
         user = cur.fetchone()
-       
+
         cur.close()
         connection.close()
         if user and bcrypt.checkpw(password.encode('utf-8'), user[6].encode('utf-8')):
@@ -122,30 +121,30 @@ def check_username():
     data = request.get_json()
 
     username = data.get('username')
-    cur.execute("SELECT * FROM Users WHERE username = %s", (username,))
+    cur.execute("SELECT * FROM USERS WHERE username = %s", (username,))
     result = cur.fetchone()
-    
+
     cur.close()
-   
+
     if result:
       return jsonify({'success': True, 'message': 'Username Exists: ' + username})
     else:
       return jsonify({'success': False, 'message': 'Username Not Found: ' + username})
   except Exception as e:
     return jsonify({'error': str(e)})
-  
+
 @app.route('/api/check/email', methods=['POST'])
 def check_email():
   try:
     connection = mysql.connector.connect(**config)
     cur = connection.cursor()
     data = request.get_json()
-    
+
     email = data.get('email')
-    cur.execute("SELECT * FROM Users WHERE email = %s", (email,))
+    cur.execute("SELECT * FROM USERS WHERE email = %s", (email,))
     result = cur.fetchone()
     cur.close()
-  
+
     if result:
       return jsonify({'success': True, 'message': 'Email Exists: ' + email})
     else:
@@ -158,7 +157,7 @@ def get_non_admin_users():
     try:
       connection = mysql.connector.connect(**config)
       cursor = connection.cursor(dictionary=True)
-      cursor.execute("SELECT * FROM Users WHERE USER_ADMIN = 0")
+      cursor.execute("SELECT * FROM USERS WHERE USER_ADMIN = 0")
       users = cursor.fetchall()
       users_data = []
       for user in users:
@@ -174,7 +173,7 @@ def get_admin_users():
     try:
       connection = mysql.connector.connect(**config)
       cursor = connection.cursor(dictionary=True)
-      cursor.execute("SELECT * FROM Users WHERE USER_ADMIN = 1")
+      cursor.execute("SELECT * FROM USERS WHERE USER_ADMIN = 1")
       users = cursor.fetchall()
       users_data = []
       for user in users:
@@ -194,11 +193,11 @@ def delete_user():
 
     user_id = body.get('user_id')
 
-    cur.execute("SELECT * FROM Users WHERE user_id = %s", (user_id,))
+    cur.execute("SELECT * FROM USERS WHERE user_id = %s", (user_id,))
     user = cur.fetchone()
 
     if user:
-      cur.execute("DELETE FROM Users WHERE user_id = %s", (user_id,))
+      cur.execute("DELETE FROM USERS WHERE user_id = %s", (user_id,))
       connection.commit()
       cur.close()
       connection.close()
@@ -214,17 +213,17 @@ def delete_user():
 @app.route('/api/user_data', methods=['GET'])
 def get_user():
   try:
-    user_id = request.args.get('userId')  
+    user_id = request.args.get('userId')
     connection = mysql.connector.connect(**config)
     cur = connection.cursor(dictionary=True)
-    cur.execute("SELECT * FROM Users WHERE user_id = %s", (user_id,))
+    cur.execute("SELECT * FROM USERS WHERE user_id = %s", (user_id,))
     user = cur.fetchone()
     user['SHORTEST_TIME'] = user['SHORTEST_TIME'].total_seconds()
     connection.close()
     return jsonify(user)
   except Exception as e:
     return jsonify({'error': str(e)})
-  
+
 @app.route('/api/update_user_data', methods=['POST'])
 def update_user_data():
   try:
@@ -238,7 +237,7 @@ def update_user_data():
 
     print(time)
 
-    cur.execute("SELECT SHORTEST_TIME, LOWEST_NUMBER_OF_MISTAKES FROM Users WHERE user_id = %s", (user_id,))
+    cur.execute("SELECT SHORTEST_TIME, LOWEST_NUMBER_OF_MISTAKES FROM USERS WHERE user_id = %s", (user_id,))
     result = cur.fetchone()
 
     print(result)
@@ -252,11 +251,11 @@ def update_user_data():
         new_time_seconds = time % 60
         new_time_str = "{:02d}:{:02d}:{:02d}".format(new_time_hours, new_time_minutes, new_time_seconds)
 
-      if time and (db_time.total_seconds() == 0 or time < db_time.total_seconds()):  
-        cur.execute("UPDATE Users SET SHORTEST_TIME = %s WHERE user_id = %s", (new_time_str, user_id))
+      if time and (db_time.total_seconds() == 0 or time < db_time.total_seconds()):
+        cur.execute("UPDATE USERS SET SHORTEST_TIME = %s WHERE user_id = %s", (new_time_str, user_id))
 
       if mistakes is not None and (db_mistakes == -1 or mistakes < db_mistakes):
-        cur.execute("UPDATE Users SET LOWEST_NUMBER_OF_MISTAKES = %s WHERE user_id = %s", (mistakes, user_id))
+        cur.execute("UPDATE USERS SET LOWEST_NUMBER_OF_MISTAKES = %s WHERE user_id = %s", (mistakes, user_id))
     else:
       return jsonify({'error': 'User not found'})
 
@@ -267,7 +266,7 @@ def update_user_data():
 
   except Exception as e:
     return jsonify({'error': str(e)})
-  
+
 @app.route('/api/update_admin', methods=['POST'])
 def update_admin():
   try:
@@ -277,11 +276,11 @@ def update_admin():
 
     user_id = body.get('user_id')
 
-    cur.execute("SELECT * FROM Users WHERE user_id = %s", (user_id,))
+    cur.execute("SELECT * FROM USERS WHERE user_id = %s", (user_id,))
     result = cur.fetchone()
 
     if result:
-      cur.execute("UPDATE Users SET USER_ADMIN = %s WHERE user_id = %s", (1, user_id))
+      cur.execute("UPDATE USERS SET USER_ADMIN = %s WHERE user_id = %s", (1, user_id))
       connection.commit()
     else:
       return jsonify({'error': 'User not found'})
@@ -292,7 +291,7 @@ def update_admin():
   except Exception as e:
     return jsonify({'error': str(e)})
 
-   
+
 
 if __name__ == "__main__":
     # Run SQL scripts
