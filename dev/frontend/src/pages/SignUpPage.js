@@ -19,6 +19,11 @@ const SignUpPage = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     
+    setUsernameExists(false);
+    setEmailExists(false);
+    setFillOut(false);
+    setPasswordLength(false);
+    
     if (!firstName || !lastName || !email || !username || !password) {
       setFillOut(true);
       return;
