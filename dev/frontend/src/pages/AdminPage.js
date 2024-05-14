@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@material-tailwind/react";
 import { setAnimation } from "@material-tailwind/react/components/Tabs/TabsContext";
 import Cookies from "js-cookie";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const AdminPage = () => {
   const navigate = useNavigate();
@@ -41,51 +41,67 @@ const AdminPage = () => {
   }, []);
 
   const deleteUser = (userId) => {
-    const deleteAccount = {
-      user_id: userId,
-    };
-    fetch("http://aiqbal.pythonanywhere.com/api/deleteUser", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(deleteAccount),
-    })
-      .then((response) => response.json())
-      .then((deleteUser) => {
-        if (deleteUser.success) {
-          console.log("Delete Successful!");
-          window.location.reload(); 
-        } else {
-          console.log("Delete Failed: ", deleteUser.message);
-        }
+    if (
+      window.confirm(
+        "Before proceeding, please confirm: Would you like to delete the user with ID " +
+          userId +
+          "?"
+      ) === true
+    ) {
+      const deleteAccount = {
+        user_id: userId,
+      };
+      fetch("http://aiqbal.pythonanywhere.com/api/deleteUser", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(deleteAccount),
       })
-      .catch((error) => console.log(error));
-    console.log(`Deleting user with ID: ${userId}`);
+        .then((response) => response.json())
+        .then((deleteUser) => {
+          if (deleteUser.success) {
+            console.log("Delete Successful!");
+            window.location.reload();
+          } else {
+            console.log("Delete Failed: ", deleteUser.message);
+          }
+        })
+        .catch((error) => console.log(error));
+      console.log(`Deleting user with ID: ${userId}`);
+    }
   };
 
   const changeStatus = (userId) => {
-    const changeAccount = {
-      user_id: userId,
-    };
-    fetch("http://aiqbal.pythonanywhere.com/api/update_admin", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(changeAccount),
-    })
-      .then((response) => response.json())
-      .then((changeUser) => {
-        console.log(changeUser)
-        if (changeUser.success) {
-          console.log("Status Changed Successfully!");
-          window.location.reload(); 
-        } else {
-          console.log("Status Change Failed: ", changeUser.message);
-        }
+    if (
+      window.confirm(
+        "Before proceeding, please confirm: Would you like to change the user with ID " +
+          userId +
+          " to an admin?"
+      ) === true
+    ) {
+      const changeAccount = {
+        user_id: userId,
+      };
+      fetch("http://aiqbal.pythonanywhere.com/api/update_admin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(changeAccount),
       })
-      .catch((error) => console.log(error));
+        .then((response) => response.json())
+        .then((changeUser) => {
+          console.log(changeUser);
+          if (changeUser.success) {
+            console.log("Status Changed Successfully!");
+            window.location.reload();
+          } else {
+            console.log("Status Change Failed: ", changeUser.message);
+          }
+        })
+        .catch((error) => console.log(error));
+    }
   };
 
   if (!isAuthenticated) {
@@ -110,21 +126,21 @@ const AdminPage = () => {
           <Button
             className=" text-black bg-[#F2D13A] text-md"
             style={{ fontFamily: "Delius Unicase, cursive" }}
-            onClick={() => navigate('/game')}
+            onClick={() => navigate("/game")}
           >
             Play Game
           </Button>
           <Button
             className=" text-black bg-[#F2D13A] text-md"
             style={{ fontFamily: "Delius Unicase, cursive" }}
-            onClick={() => navigate('/admin')}
+            onClick={() => navigate("/admin")}
           >
             Admin Dashboard
           </Button>
           <Button
             className=" text-black bg-[#F2D13A] text-md"
             style={{ fontFamily: "Delius Unicase, cursive" }}
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
           >
             Log Out
           </Button>

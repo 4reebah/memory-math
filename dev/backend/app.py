@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import mysql.connector
 from flask_bcrypt import bcrypt
@@ -7,7 +7,7 @@ import yaml
 from datetime import datetime
 
 app = Flask(__name__)
-CORS(app, origins=['http://aiqbal.pythonanywhere.com/', 'https://memory-math.vercel.app', 'http://localhost:3000'])
+CORS(app, origins=['http://aiqbal.pythonanywhere.com', 'http://localhost:3000'])
 
 config = {
   'user': 'aiqbal',
@@ -18,32 +18,31 @@ config = {
 }
 
 def run_sql_script(filename):
-    """
-    Run SQL script.
-    """
-    try:
-        connection = mysql.connector.connect(**config)
-        cursor = connection.cursor()
+  """
+  Run SQL script.
+  """
+  try:
+    connection = mysql.connector.connect(**config)
+    cursor = connection.cursor()
 
-        with open(filename, 'r') as f:
-            sql_script = f.read()
-            cursor.execute(sql_script, multi=True)
-            connection.commit()
+    with open(filename, 'r') as f:
+      sql_script = f.read()
+      cursor.execute(sql_script, multi=True)
+      connection.commit()
 
-    except mysql.connector.Error as error:
-        print("Error running SQL script:", error)
+  except mysql.connector.Error as error:
+    print("Error running SQL script:", error)
 
-    finally:
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
+  finally:
+    if connection.is_connected():
+      cursor.close()
+      connection.close()
 
 # Serve static files from the build directory
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_static(path):
    return send_from_directory('../frontend/build', 'index.html')
-
 
 @app.route('/api')
 def backend():
@@ -69,25 +68,25 @@ def get_users():
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    try:
-        connection = mysql.connector.connect(**config)
-        cur = connection.cursor()
+  try:
+    connection = mysql.connector.connect(**config)
+    cur = connection.cursor()
 
-        data = request.get_json()
-        username = data.get('username')
-        password = data.get('password')
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
 
-        cur.execute("SELECT * FROM USERS WHERE username = %s", (username,))
-        user = cur.fetchone()
+    cur.execute("SELECT * FROM USERS WHERE username = %s", (username,))
+    user = cur.fetchone()
 
-        cur.close()
-        connection.close()
-        if user and bcrypt.checkpw(password.encode('utf-8'), user[6].encode('utf-8')):
-            return jsonify({'success': True, 'message': 'Login successful', 'id': user[0], 'admin': user[1], 'username': user[5]})
-        else:
-            return jsonify({'success': False, 'message': 'Invalid username or password.'})
-    except Exception as e:
-        return jsonify({'error': str(e)})
+    cur.close()
+    connection.close()
+    if user and bcrypt.checkpw(password.encode('utf-8'), user[6].encode('utf-8')):
+      return jsonify({'success': True, 'message': 'Login successful', 'id': user[0], 'admin': user[3], 'username': user[5]})
+    else:
+      return jsonify({'success': False, 'message': 'Invalid username or password.'})
+  except Exception as e:
+    return jsonify({'error': str(e)})
 
 @app.route('/api/add_user', methods=['POST'])
 def add_user():
@@ -154,35 +153,35 @@ def check_email():
 
 @app.route('/api/users/nonadmin', methods=['GET'])
 def get_non_admin_users():
-    try:
-      connection = mysql.connector.connect(**config)
-      cursor = connection.cursor(dictionary=True)
-      cursor.execute("SELECT * FROM USERS WHERE USER_ADMIN = 0")
-      users = cursor.fetchall()
-      users_data = []
-      for user in users:
-          user['SHORTEST_TIME'] = user['SHORTEST_TIME'].total_seconds()
-          users_data.append(user)
-      connection.close()
-      return jsonify(users)
-    except Exception as e:
-      return jsonify({'error': str(e)})
+  try:
+    connection = mysql.connector.connect(**config)
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM USERS WHERE USER_ADMIN = 0")
+    users = cursor.fetchall()
+    users_data = []
+    for user in users:
+      user['SHORTEST_TIME'] = user['SHORTEST_TIME'].total_seconds()
+      users_data.append(user)
+    connection.close()
+    return jsonify(users)
+  except Exception as e:
+    return jsonify({'error': str(e)})
 
 @app.route('/api/users/admin', methods=['GET'])
 def get_admin_users():
-    try:
-      connection = mysql.connector.connect(**config)
-      cursor = connection.cursor(dictionary=True)
-      cursor.execute("SELECT * FROM USERS WHERE USER_ADMIN = 1")
-      users = cursor.fetchall()
-      users_data = []
-      for user in users:
-          user['SHORTEST_TIME'] = user['SHORTEST_TIME'].total_seconds()
-          users_data.append(user)
-      connection.close()
-      return jsonify(users)
-    except Exception as e:
-      return jsonify({'error': str(e)})
+  try:
+    connection = mysql.connector.connect(**config)
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM USERS WHERE USER_ADMIN = 1")
+    users = cursor.fetchall()
+    users_data = []
+    for user in users:
+      user['SHORTEST_TIME'] = user['SHORTEST_TIME'].total_seconds()
+      users_data.append(user)
+    connection.close()
+    return jsonify(users)
+  except Exception as e:
+    return jsonify({'error': str(e)})
 
 @app.route('/api/deleteUser', methods=['POST'])
 def delete_user():
@@ -291,15 +290,13 @@ def update_admin():
   except Exception as e:
     return jsonify({'error': str(e)})
 
-
-
 if __name__ == "__main__":
-    # Run SQL scripts
-    scripts_path = os.path.join(os.path.dirname(__file__), 'db')
-    for filename in os.listdir(scripts_path):
-        if filename.endswith('.sql'):
-            script_file = os.path.join(scripts_path, filename)
-            run_sql_script(script_file)
+  # Run SQL scripts
+  scripts_path = os.path.join(os.path.dirname(__file__), 'db')
+  for filename in os.listdir(scripts_path):
+    if filename.endswith('.sql'):
+      script_file = os.path.join(scripts_path, filename)
+      run_sql_script(script_file)
 
-    # Start Flask application
-    app.run(debug=True, host='0.0.0.0', port=4000)
+  # Start Flask application
+  app.run(debug=True, host='0.0.0.0', port=4000)
