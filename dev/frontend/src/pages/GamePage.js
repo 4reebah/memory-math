@@ -22,7 +22,7 @@ const GamePage = () => {
       const adminFromCookie = JSON.parse(authCookie).adminStatus;
       setAdminStatus(adminFromCookie);
 
-      fetch(`http://aiqbal.pythonanywhere.com/user_data?userId=${id}`)
+      fetch(`http://aiqbal.pythonanywhere.com/api/user_data?userId=${id}`)
         .then((response) => response.json())
         .then((userData) => {
           setUserInfo(userData);

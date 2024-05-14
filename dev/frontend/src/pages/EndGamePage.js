@@ -49,7 +49,7 @@ const EndGamePage = () => {
         mistakes: numberMistakes,
       };
 
-      fetch("http://aiqbal.pythonanywhere.com/update_user_data", {
+      fetch("http://aiqbal.pythonanywhere.com/api/update_user_data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userStats),

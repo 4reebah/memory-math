@@ -15,7 +15,7 @@ const LoginPage = () => {
       username: username,
       password: password,
     };
-    fetch("http://aiqbal.pythonanywhere.com/login", {
+    fetch("http://aiqbal.pythonanywhere.com/api/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

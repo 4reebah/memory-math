@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import mysql.connector
@@ -14,16 +15,44 @@ config = {
   'password': 'cs161proj',
   'host': 'aiqbal.mysql.pythonanywhere-services.com',
   'port': '3306',
-  'database': 'aiqbal$memory_math',
+  'database': 'aiqbal$default',
 }
 
-@app.route('/')
+def run_sql_script(filename):
+    """
+    Run SQL script.
+    """
+    try:
+        connection = mysql.connector.connect(**config)
+        cursor = connection.cursor()
+
+        with open(filename, 'r') as f:
+            sql_script = f.read()
+            cursor.execute(sql_script, multi=True)
+            connection.commit()
+
+    except mysql.connector.Error as error:
+        print("Error running SQL script:", error)
+
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+
+# Serve static files from the build directory
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_static(path):
+   return send_from_directory('../frontend/build', 'index.html')
+
+
+@app.route('/api')
 def backend():
     return jsonify({
         'message' : 'Hello World!'
     })
 
-@app.route('/users', methods=['GET'])
+@app.route('/api/users', methods=['GET'])
 def get_users():
     try:
       connection = mysql.connector.connect(**config)
@@ -39,7 +68,7 @@ def get_users():
     except Exception as e:
       return jsonify({'error': str(e)})
 
-@app.route('/login', methods=['POST'])
+@app.route('/api/login', methods=['POST'])
 def login():
     try: 
         connection = mysql.connector.connect(**config)
@@ -61,7 +90,7 @@ def login():
     except Exception as e:
         return jsonify({'error': str(e)})
 
-@app.route('/add_user', methods=['POST'])
+@app.route('/api/add_user', methods=['POST'])
 def add_user():
   try:
     connection = mysql.connector.connect(**config)
@@ -85,7 +114,7 @@ def add_user():
   except Exception as e:
     return jsonify({'error': str(e)})
 
-@app.route('/check/username', methods=['POST'])
+@app.route('/api/check/username', methods=['POST'])
 def check_username():
   try:
     connection = mysql.connector.connect(**config)
@@ -105,7 +134,7 @@ def check_username():
   except Exception as e:
     return jsonify({'error': str(e)})
   
-@app.route('/check/email', methods=['POST'])
+@app.route('/api/check/email', methods=['POST'])
 def check_email():
   try:
     connection = mysql.connector.connect(**config)
@@ -124,7 +153,7 @@ def check_email():
   except Exception as e:
     return jsonify({'error': str(e)})
 
-@app.route('/users/nonadmin', methods=['GET'])
+@app.route('/api/users/nonadmin', methods=['GET'])
 def get_non_admin_users():
     try:
       connection = mysql.connector.connect(**config)
@@ -140,7 +169,7 @@ def get_non_admin_users():
     except Exception as e:
       return jsonify({'error': str(e)})
 
-@app.route('/users/admin', methods=['GET'])
+@app.route('/api/users/admin', methods=['GET'])
 def get_admin_users():
     try:
       connection = mysql.connector.connect(**config)
@@ -156,7 +185,7 @@ def get_admin_users():
     except Exception as e:
       return jsonify({'error': str(e)})
 
-@app.route('/deleteUser', methods=['POST'])
+@app.route('/api/deleteUser', methods=['POST'])
 def delete_user():
   try:
     connection = mysql.connector.connect(**config)
@@ -182,7 +211,7 @@ def delete_user():
   except Exception as e:
     return jsonify({'success': False, 'error': str(e)})
 
-@app.route('/user_data', methods=['GET'])
+@app.route('/api/user_data', methods=['GET'])
 def get_user():
   try:
     user_id = request.args.get('userId')  
@@ -196,7 +225,7 @@ def get_user():
   except Exception as e:
     return jsonify({'error': str(e)})
   
-@app.route('/update_user_data', methods=['POST'])
+@app.route('/api/update_user_data', methods=['POST'])
 def update_user_data():
   try:
     connection = mysql.connector.connect(**config)
@@ -239,7 +268,7 @@ def update_user_data():
   except Exception as e:
     return jsonify({'error': str(e)})
   
-@app.route('/update_admin', methods=['POST'])
+@app.route('/api/update_admin', methods=['POST'])
 def update_admin():
   try:
     connection = mysql.connector.connect(**config)
@@ -265,5 +294,13 @@ def update_admin():
 
    
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    # Run SQL scripts
+    scripts_path = os.path.join(os.path.dirname(__file__), 'db')
+    for filename in os.listdir(scripts_path):
+        if filename.endswith('.sql'):
+            script_file = os.path.join(scripts_path, filename)
+            run_sql_script(script_file)
+
+    # Start Flask application
+    app.run(debug=True, host='0.0.0.0', port=4000)

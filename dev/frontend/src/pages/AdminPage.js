@@ -12,7 +12,7 @@ const AdminPage = () => {
   const isAuthenticated = !!Cookies.get("auth");
 
   useEffect(() => {
-    fetch("http://aiqbal.pythonanywhere.com/users/admin")
+    fetch("http://aiqbal.pythonanywhere.com/api/users/admin")
       .then((response) => response.json())
       .then((users) => {
         setAdminUsers(users);
@@ -22,7 +22,7 @@ const AdminPage = () => {
   }, []);
 
   useEffect(() => {
-    fetch("http://aiqbal.pythonanywhere.com/users/nonadmin")
+    fetch("http://aiqbal.pythonanywhere.com/api/users/nonadmin")
       .then((response) => response.json())
       .then((users) => {
         setNonAdminUsers(users);
@@ -44,7 +44,7 @@ const AdminPage = () => {
     const deleteAccount = {
       user_id: userId,
     };
-    fetch("http://aiqbal.pythonanywhere.com/deleteUser", {
+    fetch("http://aiqbal.pythonanywhere.com/api/deleteUser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -68,7 +68,7 @@ const AdminPage = () => {
     const changeAccount = {
       user_id: userId,
     };
-    fetch("http://aiqbal.pythonanywhere.com/update_admin", {
+    fetch("http://aiqbal.pythonanywhere.com/api/update_admin", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
