@@ -6,6 +6,9 @@ Memory Math-o-rama!
 ## URL to the GitHub Repository: 
 https://github.com/4reebah/memory-math
 
+## URL to the Deployed Website: 
+http://aiqbal.pythonanywhere.com
+
 ## Milestones with Deadlines:
   - M1 (2/4 - 2/16): Setting up Github and Flask App Setup
   - M2 (2/16 - 3/1): User authentication (Login, Signup and Logout)
