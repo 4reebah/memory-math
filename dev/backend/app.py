@@ -9,13 +9,22 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app, origins=['http://aiqbal.pythonanywhere.com', 'http://localhost:3000'])
 
+# For local build
 config = {
-  'user': 'aiqbal',
-  'password': 'cs161proj',
-  'host': 'aiqbal.mysql.pythonanywhere-services.com',
-  'port': '3306',
-  'database': 'aiqbal$default',
+  'user': 'root',
+  'password': "",
+  'host': 'localhost',
+  'database': 'memory-math',
 }
+
+# For the deployment
+# config = {
+#   'user': 'aiqbal',
+#   'password': 'cs161proj',
+#   'host': 'aiqbal.mysql.pythonanywhere-services.com',
+#   'port': '3306',
+#   'database': 'aiqbal$default',
+# }
 
 def run_sql_script(filename):
   """
@@ -291,12 +300,12 @@ def update_admin():
     return jsonify({'error': str(e)})
 
 if __name__ == "__main__":
-  # Run SQL scripts
-  scripts_path = os.path.join(os.path.dirname(__file__), 'db')
-  for filename in os.listdir(scripts_path):
-    if filename.endswith('.sql'):
-      script_file = os.path.join(scripts_path, filename)
-      run_sql_script(script_file)
+  # Run SQL scripts - For deployment
+  # scripts_path = os.path.join(os.path.dirname(__file__), 'db')
+  # for filename in os.listdir(scripts_path):
+  #   if filename.endswith('.sql'):
+  #     script_file = os.path.join(scripts_path, filename)
+  #     run_sql_script(script_file)
 
   # Start Flask application
-  app.run(debug=True, host='0.0.0.0', port=4000)
+  app.run(debug=True, host='0.0.0.0', port=5000)
