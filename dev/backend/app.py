@@ -51,6 +51,8 @@ def run_sql_script(filename):
                 pass
             connection.commit()  
         cursor.close()
+        connection.close()
+
     except mysql.connector.Error as error:
         print("Error running SQL script:", error)
 
@@ -316,4 +318,4 @@ if __name__ == "__main__":
         run_sql_script(script_file)
   
   # Start Flask application
-  app.run(debug=True, host='0.0.0.0', port=5001)
+  app.run(debug=True, host='0.0.0.0', port=5000)
