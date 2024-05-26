@@ -2,7 +2,7 @@
 -- DROP SCHEMA IF EXISTS memory_math;
 
 -- Create a new database schema
-CREATE SCHEMA IF NOT EXISTS aiqbal$default;
+CREATE SCHEMA IF NOT EXISTS memory_math;
 
 -- Drop exist user
 -- DROP USER IF EXISTS 'memory_math'@'localhost';

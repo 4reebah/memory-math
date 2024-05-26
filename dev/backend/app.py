@@ -14,7 +14,7 @@ config = {
   'user': 'root',
   'password': "",
   'host': 'localhost',
-  'database': 'memory-math',
+  'database': 'memory_math',
 }
 
 # For the deployment
@@ -26,26 +26,34 @@ config = {
 #   'database': 'aiqbal$default',
 # }
 
-def run_sql_script(filename):
-  """
-  Run SQL script.
-  """
-  try:
-    connection = mysql.connector.connect(**config)
+def create_schema():
+    connection = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password=""
+    )
     cursor = connection.cursor()
+    cursor.execute("CREATE SCHEMA IF NOT EXISTS memory_math;")
+    connection.commit()  
+    cursor.close()
 
-    with open(filename, 'r') as f:
-      sql_script = f.read()
-      cursor.execute(sql_script, multi=True)
-      connection.commit()
+def run_sql_script(filename):
+    """
+    Run SQL script.
+    """
+    try:
+        connection = mysql.connector.connect(**config)
+        cursor = connection.cursor()
+        with open(filename, 'r') as f: 
+            sql_script = f.read()
+            results = cursor.execute(sql_script, multi=True)
+            for result in results: 
+                pass
+            connection.commit()  
+            cursor.close()
 
-  except mysql.connector.Error as error:
-    print("Error running SQL script:", error)
-
-  finally:
-    if connection.is_connected():
-      cursor.close()
-      connection.close()
+    except mysql.connector.Error as error:
+        print("Error running SQL script:", error)
 
 # Serve static files from the build directory
 @app.route('/', defaults={'path': ''})
@@ -300,12 +308,13 @@ def update_admin():
     return jsonify({'error': str(e)})
 
 if __name__ == "__main__":
-  # Run SQL scripts - For deployment
-  # scripts_path = os.path.join(os.path.dirname(__file__), 'db')
-  # for filename in os.listdir(scripts_path):
-  #   if filename.endswith('.sql'):
-  #     script_file = os.path.join(scripts_path, filename)
-  #     run_sql_script(script_file)
-
+  create_schema()
+  # Run SQL scripts
+  scripts_path = os.path.join(os.path.dirname(__file__), 'sqldb')
+  for filename in os.listdir(scripts_path):
+    if filename.endswith('.sql'):
+        script_file = os.path.join(scripts_path, filename)
+        run_sql_script(script_file)
+  
   # Start Flask application
   app.run(debug=True, host='0.0.0.0', port=5000)
