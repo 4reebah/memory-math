@@ -46,11 +46,11 @@ def run_sql_script(filename):
         cursor = connection.cursor()
         with open(filename, 'r') as f: 
             sql_script = f.read()
-            results = cursor.execute(sql_script, multi=True)
-            for result in results: 
-                pass
-            connection.commit()  
-            cursor.close()
+            print(sql_script)
+            cursor.execute(sql_script, multi=True)
+            connection.commit()
+        cursor.close()
+        connection.close()
 
     except mysql.connector.Error as error:
         print("Error running SQL script:", error)
